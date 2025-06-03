@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Job XP Calculator</title>
+    <style>
+        :root {
+            --primary: #4f8cff;
+            --primary-dark: #2c5db6;
+            --bg: #f8fafc;
+            --card-bg: #fff;
+            --border: #e0e6ed;
+            --text: #222;
+            --muted: #6b7280;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 2.5rem 2rem 2rem 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+            background: #f4f7fb;
+            transition: border-color 0.2s;
+        }
+        select:focus, input[type="number"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.7rem 0;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(79,140,255,0.08);
+        }
+        button:hover, button:focus {
+            background: var(--primary-dark);
+        }
+        #result {
+            background: #eaf1ff;
+            color: var(--primary-dark);
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.08rem;
+            box-shadow: 0 1px 4px rgba(79,140,255,0.06);
+        }
+        #items {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f9fbfd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 8px rgba(44,93,182,0.04);
+        }
+        th, td {
+            padding: 0.85rem 0.7rem;
+            text-align: left;
+        }
+        th {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+        tr:nth-child(even) td {
+            background: #f2f6fc;
+        }
+        tr:hover td {
+            background: #eaf1ff;
+        }
+        td {
+            border-bottom: 1px solid var(--border);
+            font-size: 1rem;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.2rem 0.5rem;
+            }
+            th, td {
+                padding: 0.6rem 0.3rem;
+                font-size: 0.97rem;
+            }
+        }
+
+        .corner-credit {
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            display: flex;
+            align-items: flex-end;
+            z-index: 1000;
+            pointer-events: none;
+            user-select: none;
+        }
+        .corner-credit img {
+            width: 250px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            margin-right: 10px;
+            pointer-events: auto;
+        }
+        .corner-credit span {
+            font-size: 1.05rem;
+            color: #6b7280;
+            background: rgba(255,255,255,0.85);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Job XP Calculator</h1>
+
+        <label for="job">Select Job:</label>
+        <select id="job"></select>
+
+        <label for="level">Enter Level:</label>
+        <input type="number" id="level" min="0" value="0">
+        <button onclick="calculateXP()">Calculate XP</button>
+
+        <div id="result"></div>
+        <div id="items"></div>
+    </div>
+    <div class="corner-credit">
+        <img src="anime_girl.gif" alt="Anime Girl">
+        <span>Made by Rot</span>
+    </div>
+    <script>
+    let combinedData = [];
+
+    fetch("jobs_xp.csv")
+        .then(response => response.text())
+        .then(text => {
+            combinedData = parseCSV(text);
+            populateJobList();
+        })
+        .catch(err => {
+            document.body.innerHTML = "<h2 style='color:red;'>Error loading jobs_xp.csv. Make sure it's in the same folder as this HTML file.</h2>";
+            console.error(err);
+        });
+
+    function parseCSV(text) {
+        const lines = text.trim().split("\n");
+        const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ''));
+        return lines.slice(1).map(line => {
+            const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(v => v.replace(/^"|"$/g, ''));
+            return Object.fromEntries(headers.map((h, i) => [h, values[i]]));
+        });
+    }
+
+    function populateJobList() {
+        const jobSelect = document.getElementById('job');
+        const jobs = [...new Set(combinedData.map(row => row.Job))];
+        const fragment = document.createDocumentFragment();
+        jobs.forEach(job => {
+            const option = document.createElement('option');
+            option.value = job;
+            option.textContent = job;
+            fragment.appendChild(option);
+        });
+        jobSelect.innerHTML = '';
+        jobSelect.appendChild(fragment);
+    }
+
+    // Sorting state
+    let sortState = { column: null, asc: true, rows: [] };
+
+    function calculateXP() {
+        const n = parseInt(document.getElementById('level').value, 10);
+        const selectedJob = document.getElementById('job').value;
+        if (!selectedJob || isNaN(n) || n < 0) {
+            document.getElementById('result').innerHTML = "<span style='color:red;'>Please enter a non-negative level.</span>";
+            return;
+        }
+
+        // XP for next level
+        const xpNext = 4 * n * n + 10 * n;
+        // XP for current level (from previous level to this one)
+        const xpCurrent = n > 0 ? 4 * (n - 1) * (n - 1) + 10 * (n - 1) : 0;
+
+        let totalXP = 0;
+        for (let i = 0; i < n; i++) {
+            totalXP += 4 * i * i + 10 * i;
+        }
+
+        document.getElementById('result').innerHTML =
+            `XP required for next level: <b>${xpNext}</b><br>Total XP required to reach this level: <b>${totalXP}</b>`;
+
+        const jobData = combinedData.filter(row => row.Job === selectedJob);
+
+        // Prepare rows for sorting
+        sortState.rows = jobData.map(row => {
+            const xpPerItem = parseFloat(row.XP);
+            const neededNext = !isNaN(xpPerItem) && xpPerItem > 0 ? Math.ceil(xpNext / xpPerItem) : null;
+            const neededCurrent = !isNaN(xpPerItem) && xpPerItem > 0 ? Math.ceil(totalXP / xpPerItem) : null;
+            return {
+                Action: row.Action,
+                Item: row.Item,
+                XP: xpPerItem,
+                NeededNext: neededNext,
+                NeededCurrent: neededCurrent
+            };
+        });
+
+        renderTable();
+    }
+
+    function renderTable() {
+        const itemsDiv = document.getElementById('items');
+        itemsDiv.innerHTML = '';
+
+        const table = document.createElement('table');
+        table.style.borderCollapse = 'collapse';
+        table.style.width = '100%';
+
+        const headerRow = document.createElement('tr');
+        const headers = [
+            { text: 'Action', key: 'Action' },
+            { text: 'Item', key: 'Item' },
+            { text: 'XP', key: 'XP' },
+            { text: 'Needed for Next Level', key: 'NeededNext' },
+            { text: 'Needed for Current Level', key: 'NeededCurrent' }
+        ];
+
+        headers.forEach((header, idx) => {
+            const th = document.createElement('th');
+            th.textContent = header.text;
+            th.style.cursor = 'pointer';
+            th.onclick = () => sortTableBy(header.key);
+            // Add sort indicator
+            if (sortState.column === header.key) {
+             th.textContent += sortState.asc ? " ▲" : " ▼";
+            }
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        let rows = sortState.rows.slice();
+        if (sortState.column) {
+            rows.sort((a, b) => {
+                let v1 = a[sortState.column];
+                let v2 = b[sortState.column];
+                // Handle nulls
+                if (v1 === null) v1 = Number.POSITIVE_INFINITY;
+                if (v2 === null) v2 = Number.POSITIVE_INFINITY;
+                if (typeof v1 === "number" && typeof v2 === "number") {
+                    return sortState.asc ? v1 - v2 : v2 - v1;
+                }
+                return sortState.asc
+                    ? String(v1).localeCompare(String(v2))
+                    : String(v2).localeCompare(String(v1));
+            });
+        }
+
+        rows.forEach(row => {
+            const dataRow = document.createElement('tr');
+            [
+                row.Action,
+                row.Item,
+                isNaN(row.XP) ? '–' : row.XP,
+                row.NeededNext !== null ? row.NeededNext + ' Times' : '–',
+                row.NeededCurrent !== null ? row.NeededCurrent + ' Times' : '–'
+            ].forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                dataRow.appendChild(td);
+            });
+            table.appendChild(dataRow);
+        });
+
+        itemsDiv.appendChild(table);
+    }
+
+    function sortTableBy(column) {
+        if (sortState.column === column) {
+            sortState.asc = !sortState.asc;
+        } else {
+            sortState.column = column;
+            sortState.asc = true;
+        }
+        renderTable();
+    }
+</script>
+</body>
+</html>
