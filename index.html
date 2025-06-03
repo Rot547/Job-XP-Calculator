@@ -150,17 +150,39 @@
             margin-bottom: 8px;
             pointer-events: auto;
         }
+            .flex-row > div {
+                margin-right: 0;
+            }
+
+            .flex-row > div:not(:last-child) {
+            margin-right: 1rem;
+            }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Job XP Calculator</h1>
 
+        
+
         <label for="job">Select Job:</label>
         <select id="job"></select>
 
-        <label for="level">Enter Level:</label>
-        <input type="number" id="level" min="0" value="0">
+<div class="flex-row" style="display: flex; gap: 1.5rem; align-items: flex-end; margin-bottom: 1.2rem; flex-wrap: wrap;">
+    <div style="flex: 1 1 110px; min-width: 110px; max-width: 160px;">
+        <label for="fromLevel">From Level:</label>
+        <input type="number" id="fromLevel" min="0" value="0" style="width: 100%;">
+    </div>
+    <div style="flex: 1 1 110px; min-width: 110px; max-width: 160px;">
+        <label for="toLevel">To Level:</label>
+        <input type="number" id="toLevel" min="1" value="1" style="width: 100%;">
+    </div>
+    <div style="flex: 1 1 120px; min-width: 120px; max-width: 170px;">
+        <label for="xpMultiplier">XP Multiplier:</label>
+        <input type="number" id="xpMultiplier" min="0.01" step="0.01" value="1" style="width: 100%;">
+    </div>
+</div>
         <button onclick="calculateXP()">Calculate XP</button>
 
         <div id="result"></div>
@@ -207,124 +229,110 @@
         jobSelect.appendChild(fragment);
     }
 
-    // Sorting state
     let sortState = { column: null, asc: true, rows: [] };
 
-    function calculateXP() {
-        const n = parseInt(document.getElementById('level').value, 10);
-        const selectedJob = document.getElementById('job').value;
-        if (!selectedJob || isNaN(n) || n < 0) {
-            document.getElementById('result').innerHTML = "<span style='color:red;'>Please enter a non-negative level.</span>";
-            return;
-        }
+function calculateXP() {
+    const fromLevel = parseInt(document.getElementById('fromLevel').value, 10);
+    const toLevel = parseInt(document.getElementById('toLevel').value, 10);
+    const selectedJob = document.getElementById('job').value;
+    const xpMultiplier = parseFloat(document.getElementById('xpMultiplier').value) || 1;
 
-        // XP for next level
-        const xpNext = 4 * n * n + 10 * n;
-        // XP for current level (from previous level to this one)
-        const xpCurrent = n > 0 ? 4 * (n - 1) * (n - 1) + 10 * (n - 1) : 0;
-
-        let totalXP = 0;
-        for (let i = 0; i < n; i++) {
-            totalXP += 4 * i * i + 10 * i;
-        }
-
-        document.getElementById('result').innerHTML =
-            `XP required for next level: <b>${xpNext}</b><br>Total XP required to reach this level: <b>${totalXP}</b>`;
-
-        const jobData = combinedData.filter(row => row.Job === selectedJob);
-
-        // Prepare rows for sorting
-        sortState.rows = jobData.map(row => {
-            const xpPerItem = parseFloat(row.XP);
-            const neededNext = !isNaN(xpPerItem) && xpPerItem > 0 ? Math.ceil(xpNext / xpPerItem) : null;
-            const neededCurrent = !isNaN(xpPerItem) && xpPerItem > 0 ? Math.ceil(totalXP / xpPerItem) : null;
-            return {
-                Action: row.Action,
-                Item: row.Item,
-                XP: xpPerItem,
-                NeededNext: neededNext,
-                NeededCurrent: neededCurrent
-            };
-        });
-
-        renderTable();
+    if (!selectedJob || isNaN(fromLevel) || isNaN(toLevel) || fromLevel < 0 || toLevel <= fromLevel || xpMultiplier <= 0) {
+        document.getElementById('result').innerHTML = "<span style='color:red;'>Please enter a valid level range and multiplier (To Level must be greater than From Level, multiplier > 0).</span>";
+        return;
     }
 
-    function renderTable() {
-        const itemsDiv = document.getElementById('items');
-        itemsDiv.innerHTML = '';
+    let xpFrom = 0, xpTo = 0;
+    for (let i = 0; i < fromLevel; i++) xpFrom += 4 * i * i + 10 * i;
+    for (let i = 0; i < toLevel; i++) xpTo += 4 * i * i + 10 * i;
+    const xpNeeded = Math.ceil((xpTo - xpFrom) / xpMultiplier);
 
-        const table = document.createElement('table');
-        table.style.borderCollapse = 'collapse';
-        table.style.width = '100%';
+    document.getElementById('result').innerHTML =
+        `XP required to go from level <b>${fromLevel}</b> to <b>${toLevel}</b> <br>with amplifier <b>${xpMultiplier}x</b>: <b>${xpNeeded}</b>`;
 
-        const headerRow = document.createElement('tr');
-        const headers = [
-            { text: 'Action', key: 'Action' },
-            { text: 'Item', key: 'Item' },
-            { text: 'XP', key: 'XP' },
-            { text: 'Needed for Next Level', key: 'NeededNext' },
-            { text: 'Needed for Current Level', key: 'NeededCurrent' }
-        ];
+    const jobData = combinedData.filter(row => row.Job === selectedJob);
 
-        headers.forEach((header, idx) => {
-            const th = document.createElement('th');
-            th.textContent = header.text;
-            th.style.cursor = 'pointer';
-            th.onclick = () => sortTableBy(header.key);
-            // Add sort indicator
-            if (sortState.column === header.key) {
-             th.textContent += sortState.asc ? " ▲" : " ▼";
+    sortState.rows = jobData.map(row => {
+        const baseXP = parseFloat(row.XP);
+        const xpPerItem = !isNaN(baseXP) ? baseXP : NaN;
+        const moneyPerItem = parseFloat(row.Money);
+        const needed = !isNaN(xpPerItem) && xpPerItem > 0 ? Math.ceil(xpNeeded / xpPerItem) : null;
+        const money = (!isNaN(moneyPerItem) && needed !== null) ? (moneyPerItem * (needed || 0)) : null;
+        return {
+            Action: row.Action,
+            Item: row.Item,
+            XP: !isNaN(xpPerItem) ? xpPerItem.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '–',
+            Needed: needed,
+            Money: money !== null ? money.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '–'
+        };
+    });
+
+    renderTable();
+}
+
+function renderTable() {
+    const itemsDiv = document.getElementById('items');
+    itemsDiv.innerHTML = '';
+
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+
+    const headerRow = document.createElement('tr');
+    const headers = [
+        { text: 'Action', key: 'Action' },
+        { text: 'Item', key: 'Item' },
+        { text: 'XP', key: 'XP' },
+        { text: 'Needed for Range', key: 'Needed' },
+        { text: 'Money for Range', key: 'Money' }
+    ];
+
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header.text;
+        th.style.cursor = 'pointer';
+        th.onclick = () => sortTableBy(header.key);
+        if (sortState.column === header.key) {
+            th.textContent += sortState.asc ? " ▲" : " ▼";
+        }
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    let rows = sortState.rows.slice();
+    if (sortState.column) {
+        rows.sort((a, b) => {
+            let v1 = a[sortState.column];
+            let v2 = b[sortState.column];
+            if (v1 === null) v1 = Number.POSITIVE_INFINITY;
+            if (v2 === null) v2 = Number.POSITIVE_INFINITY;
+            if (typeof v1 === "number" && typeof v2 === "number") {
+                return sortState.asc ? v1 - v2 : v2 - v1;
             }
-            headerRow.appendChild(th);
+            return sortState.asc
+                ? String(v1).localeCompare(String(v2))
+                : String(v2).localeCompare(String(v1));
         });
-        table.appendChild(headerRow);
-
-        let rows = sortState.rows.slice();
-        if (sortState.column) {
-            rows.sort((a, b) => {
-                let v1 = a[sortState.column];
-                let v2 = b[sortState.column];
-                // Handle nulls
-                if (v1 === null) v1 = Number.POSITIVE_INFINITY;
-                if (v2 === null) v2 = Number.POSITIVE_INFINITY;
-                if (typeof v1 === "number" && typeof v2 === "number") {
-                    return sortState.asc ? v1 - v2 : v2 - v1;
-                }
-                return sortState.asc
-                    ? String(v1).localeCompare(String(v2))
-                    : String(v2).localeCompare(String(v1));
-            });
-        }
-
-        rows.forEach(row => {
-            const dataRow = document.createElement('tr');
-            [
-                row.Action,
-                row.Item,
-                isNaN(row.XP) ? '–' : row.XP,
-                row.NeededNext !== null ? row.NeededNext + ' Times' : '–',
-                row.NeededCurrent !== null ? row.NeededCurrent + ' Times' : '–'
-            ].forEach(cellText => {
-                const td = document.createElement('td');
-                td.textContent = cellText;
-                dataRow.appendChild(td);
-            });
-            table.appendChild(dataRow);
-        });
-
-        itemsDiv.appendChild(table);
     }
 
-    function sortTableBy(column) {
-        if (sortState.column === column) {
-            sortState.asc = !sortState.asc;
-        } else {
-            sortState.column = column;
-            sortState.asc = true;
-        }
-        renderTable();
-    }
+    rows.forEach(row => {
+        const dataRow = document.createElement('tr');
+        [
+            row.Action,
+            row.Item,
+            isNaN(row.XP) ? '–' : row.XP,
+            row.Needed !== null ? row.Needed + ' Times' : '–',
+            row.Money + '$'
+        ].forEach(cellText => {
+            const td = document.createElement('td');
+            td.textContent = cellText;
+            dataRow.appendChild(td);
+        });
+        table.appendChild(dataRow);
+    });
+
+    itemsDiv.appendChild(table);
+}
 </script>
 </body>
 </html>
