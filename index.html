@@ -231,6 +231,16 @@
 
     let sortState = { column: null, asc: true, rows: [] };
 
+function sortTableBy(column) {
+    if (sortState.column === column) {
+        sortState.asc = !sortState.asc;
+    } else {
+        sortState.column = column;
+        sortState.asc = true;
+    }
+    renderTable();
+}
+
 function calculateXP() {
     const fromLevel = parseInt(document.getElementById('fromLevel').value, 10);
     const toLevel = parseInt(document.getElementById('toLevel').value, 10);
