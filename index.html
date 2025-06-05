@@ -309,6 +309,7 @@
     darkToggle.onclick = () => setDarkMode(!document.body.classList.contains('dark'));
     if (localStorage.getItem('darkMode') === '1') setDarkMode(true);
 
+    // Load the CSV table
     let combinedData = [];
 
     fetch("jobs_xp.csv")
@@ -322,6 +323,7 @@
             console.error(err);
         });
 
+    // Parse CSV to array of objects    
     function parseCSV(text) {
         const lines = text.trim().split("\n");
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ''));
@@ -331,6 +333,7 @@
         });
     }
 
+    // Populate job dropdown
     function populateJobList() {
         const jobSelect = document.getElementById('job');
         const jobs = [...new Set(combinedData.map(row => row.Job))];
@@ -347,6 +350,7 @@
 
     let sortState = { column: null, asc: true, rows: [] };
 
+// Sort table by column    
 function sortTableBy(column) {
     if (sortState.column === column) {
         sortState.asc = !sortState.asc;
@@ -357,17 +361,20 @@ function sortTableBy(column) {
     renderTable();
 }
 
+// main calculation function
 function calculateXP() {
     const fromLevel = parseInt(document.getElementById('fromLevel').value, 10);
     const toLevel = parseInt(document.getElementById('toLevel').value, 10);
     const selectedJob = document.getElementById('job').value;
     const xpMultiplier = parseFloat(document.getElementById('xpMultiplier').value) || 1;
 
+    // Validate input
     if (!selectedJob || isNaN(fromLevel) || isNaN(toLevel) || fromLevel < 0 || toLevel <= fromLevel || xpMultiplier <= 0) {
         document.getElementById('result').innerHTML = "<span style='color:red;'>Please enter a valid level range and multiplier (To Level must be greater than From Level, multiplier > 0).</span>";
         return;
     }
 
+    // Calculate XP needed abd applying amplifier
     let xpFrom = 0, xpTo = 0;
     for (let i = 0; i < fromLevel; i++) xpFrom += 4 * i * i + 10 * i;
     for (let i = 0; i < toLevel; i++) xpTo += 4 * i * i + 10 * i;
@@ -376,6 +383,7 @@ function calculateXP() {
     document.getElementById('result').innerHTML =
         `XP required to go from level <b>${fromLevel}</b> to <b>${toLevel}</b> <br>with amplifier <b>${xpMultiplier}x</b>: <b>${xpNeeded}</b>`;
 
+    // Filter job data and calculate needed items and money    
     const jobData = combinedData.filter(row => row.Job === selectedJob);
 
     sortState.rows = jobData.map(row => {
@@ -400,6 +408,9 @@ function renderTable() {
     const itemsDiv = document.getElementById('items');
     itemsDiv.innerHTML = '';
 
+    const fromLevel = parseInt(document.getElementById('fromLevel').value, 10);
+    const toLevel = parseInt(document.getElementById('toLevel').value, 10);
+
     const table = document.createElement('table');
     table.style.borderCollapse = 'collapse';
     table.style.width = '100%';
@@ -409,8 +420,8 @@ function renderTable() {
         { text: 'Action', key: 'Action' },
         { text: 'Item', key: 'Item' },
         { text: 'XP', key: 'XP' },
-        { text: 'Needed for Range', key: 'Needed' },
-        { text: 'Money for Range', key: 'Money' }
+        { text: `Needed for ${fromLevel}→${toLevel}`, key: 'Needed' },
+        { text: `Money for ${fromLevel}→${toLevel}`, key: 'Money' }
     ];
 
     headers.forEach(header => {
@@ -419,19 +430,34 @@ function renderTable() {
         th.style.cursor = 'pointer';
         th.onclick = () => sortTableBy(header.key);
         if (sortState.column === header.key) {
-            th.textContent += sortState.asc ? " ▲" : " ▼";
+            const arrow = document.createElement('span');
+            arrow.style.whiteSpace = 'nowrap';
+            arrow.textContent = sortState.asc ? " ▲" : " ▼";
+            th.appendChild(arrow);
         }
         headerRow.appendChild(th);
     });
     table.appendChild(headerRow);
 
+    // Sorting stuff
     let rows = sortState.rows.slice();
     if (sortState.column) {
         rows.sort((a, b) => {
             let v1 = a[sortState.column];
             let v2 = b[sortState.column];
-            if (v1 === null) v1 = Number.POSITIVE_INFINITY;
-            if (v2 === null) v2 = Number.POSITIVE_INFINITY;
+
+            if (sortState.column === "Money") {
+                const num1 = parseFloat(String(v1).replace(/[^0-9.-]+/g, '')) || 0;
+                const num2 = parseFloat(String(v2).replace(/[^0-9.-]+/g, '')) || 0;
+                return sortState.asc ? num1 - num2 : num2 - num1;
+            }
+
+            if (sortState.column === "Needed") {
+                const num1 = parseInt(String(v1).replace(/[^0-9]+/g, '')) || 0;
+                const num2 = parseInt(String(v2).replace(/[^0-9]+/g, '')) || 0;
+                return sortState.asc ? num1 - num2 : num2 - num1;
+            }
+
             if (typeof v1 === "number" && typeof v2 === "number") {
                 return sortState.asc ? v1 - v2 : v2 - v1;
             }
@@ -441,13 +467,16 @@ function renderTable() {
         });
     }
 
+    // render rows
     rows.forEach(row => {
         const dataRow = document.createElement('tr');
         [
             row.Action,
             row.Item,
             isNaN(row.XP) ? '–' : row.XP,
-            row.Needed !== null ? row.Needed + ' Times' : '–',
+            (row.Needed !== null && !isNaN(row.Needed))
+                ? row.Needed.toLocaleString('en-US') + ' Times'
+                : '–',
             row.Money + '$'
         ].forEach(cellText => {
             const td = document.createElement('td');
