@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log Parser</title>
+  <link href="https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6c63ff;
+      --primary-dark: #5548c8;
+      --accent: #ffb6b9;
+      --bg: #f5f7fa;
+      --card-bg: rgba(255,255,255,0.75);
+      --glass-blur: 12px;
+      --border: #e0e6ed;
+      --text: #232946;
+      --muted: #8a8fa3;
+    }
+    body {
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .container {
+      max-width: 650px;
+      width: 100%;
+      margin: 3rem 0;
+      background: var(--card-bg);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(44,93,182,0.12);
+      padding: 2.5rem 2.5rem 2rem 2.5rem; 
+      box-sizing: border-box; 
+      backdrop-filter: blur(var(--glass-blur));
+      border: 1.5px solid rgba(255,255,255,0.25);
+      animation: fadeIn 1s cubic-bezier(.4,0,.2,1);
+      overflow: visible;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      letter-spacing: 1px;
+      font-weight: 700;
+      font-size: 2rem;
+      text-shadow: 0 2px 8px rgba(108,99,255,0.08);
+    }
+    p {
+      color: var(--muted);
+      font-size: 1.08rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      max-height: 340px;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      font-size: 1.05rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 8px rgba(108,99,255,0.04);
+      resize: vertical;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      box-sizing: border-box;
+    }
+    textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary, #6c63ff, 0.15);
+    }
+    .button-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      justify-content: center;
+    }
+    button {
+      padding: 0.7rem 1.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(108,99,255,0.10);
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      letter-spacing: 0.5px;
+    }
+    button:hover, button:focus {
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(108,99,255,0.18);
+    }
+    #output {
+      margin-top: 1.5rem;
+      font-size: 1.03rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.90);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 8px rgba(44,93,182,0.04);
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
+      transition: background 0.3s, color 0.3s;
+      animation: fadeIn 0.7s;
+    }
+    th, td {
+      padding: 0.85rem 0.7rem;
+      text-align: left;
+    }
+    th {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border);
+      letter-spacing: 0.5px;
+    }
+    tr {
+      animation: fadeInRow 0.7s;
+    }
+    @keyframes fadeInRow {
+      from { opacity: 0; transform: translateY(10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    tr:nth-child(even) td {
+      background: #f6f7fb;
+    }
+    tr:hover td {
+      background: #eaf1ff;
+      transition: background 0.2s;
+    }
+    td {
+      border-bottom: 1px solid var(--border);
+      font-size: 1rem;
+    }
+    .corner-credit {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      z-index: 1000;
+      pointer-events: none;
+      user-select: none;
+    }
+    .corner-credit img {
+      width: 250px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      margin-right: 10px;
+      pointer-events: auto;
+    }
+    .corner-credit span {
+      font-size: 1.05rem;
+      color: #6c63ff;
+      background: rgba(255,255,255,0.85);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      pointer-events: auto;
+      box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: underline;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 1.2rem 0.5rem;
+        max-width: 98vw;
+      }
+      th, td {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.97rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: 0.7rem 0.5rem;
+      }
+      textarea {
+        font-size: 0.97rem;
+        padding: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Latest.log Job Data Scraper</h1>
+    <p>Tool to create a CSV for the job XP</p>
+    <p>Paste your chat log below:</p>
+    <textarea id="logInput" placeholder="Paste latest.log content here..."></textarea>
+    <div class="button-row">
+      <button onclick="parseLog()">Parse</button>
+      <button onclick="downloadCSV()">Export CSV</button>
+    </div>
+    <div id="output"></div>
+  </div>
+  <div class="corner-credit">
+    <img src="anime_girl.gif" alt="Anime Girl">
+    <span id="credit-link">Made by Rot</span>
+  </div>
+  <script>
+    function parseLog() {
+      const input = document.getElementById("logInput").value;
+      const lines = input.split("\n");
+
+      const actionRegex = /\[CHAT\].*?§r\s*([\w ]+):$/;
+      const itemRegex = /\[CHAT\].*?§r\s{2}(.+?) ->\s+([\d.]+)\$ ([\d.]+)pts ([\d.]+)xp/;
+
+      let currentAction = "";
+      const items = [];
+
+      for (const line of lines) {
+        const actionMatch = line.match(actionRegex);
+        if (actionMatch) {
+          currentAction = actionMatch[1].trim();
+        }
+
+        const itemMatch = line.match(itemRegex);
+        if (itemMatch) {
+          items.push({
+            action: currentAction,
+            item: itemMatch[1],
+            price: itemMatch[2],
+            points: itemMatch[3],
+            xp: itemMatch[4]
+          });
+        }
+      }
+
+      // Output to table
+      const outputDiv = document.getElementById("output");
+      if (items.length === 0) {
+        outputDiv.innerHTML = "<p>No items found.</p>";
+        return;
+      }
+
+      let table = "<table><thead><tr><th>Action</th><th>Item</th><th>Price ($)</th><th>Points</th><th>XP</th></tr></thead><tbody>";
+      for (const item of items) {
+        table += `<tr><td>${item.action}</td><td>${item.item}</td><td>${item.price}</td><td>${item.points}</td><td>${item.xp}</td></tr>`;
+      }
+      table += "</tbody></table>";
+      outputDiv.innerHTML = table;
+
+      // Save to window for CSV export
+      window._parsedItems = items;
+    }
+
+    function downloadCSV() {
+      const items = window._parsedItems || [];
+      if (items.length === 0) return alert("Nothing to export!");
+
+      const header = "Action,Item,Price,Points,XP\n";
+      const rows = items.map(i =>
+        `"${i.action}","${i.item}",${i.price},${i.points},${i.xp}`
+      ).join("\n");
+
+      const blob = new Blob([header + rows], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "action_items.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('credit-link').onclick = function() {
+      window.open('https://im-rot.carrd.co/', '_blank');
+    };
+  </script>
+</body>
+</html>
