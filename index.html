@@ -1,124 +1,152 @@
 <head>
     <meta charset="UTF-8">
     <title>Job XP Calculator</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f8cff;
-            --primary-dark: #2c5db6;
-            --bg: #f8fafc;
-            --card-bg: #fff;
+            --primary: #6c63ff;
+            --primary-dark: #5548c8;
+            --accent: #ffb6b9;
+            --bg: #f5f7fa;
+            --card-bg: rgba(255,255,255,0.75);
+            --glass-blur: 12px;
             --border: #e0e6ed;
-            --text: #222;
-            --muted: #6b7280;
+            --text: #232946;
+            --muted: #8a8fa3;
         }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
             min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            transition:
+            background 0.6s cubic-bezier(.4,0,.2,1),
+            color 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        
+        body.dark {
+            --primary: #7daaff;
+            --primary-dark: #b3cfff;
+            --bg: #181c23;
+            --card-bg: #232733;
+            --border: #2a2e3a;
+            --text: #e7eaf3;
+            --muted: #b3b9c9;
         }
         .container {
             max-width: 600px;
-            margin: 3rem auto;
+            margin: 13rem 0; 
             background: var(--card-bg);
-            border-radius: 14px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(44,93,182,0.12);
             padding: 2.5rem 2rem 2rem 2rem;
-            transition: background 0.3s, color 0.3s;
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+            min-height: 400px;
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1.5px solid rgba(255,255,255,0.25);
+            animation: fadeIn 1s cubic-bezier(.4,0,.2,1), containerBgChange 0.7s;
+            overflow: visible;
+            transition:
+                background 0.7s cubic-bezier(.4,0,.2,1),
+                box-shadow 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes containerBgChange {
+            from {
+                background: #e0e6ed;
+            }
+            to {
+                background: var(--card-bg);
+            }
         }
         h1 {
             text-align: center;
-            color: var(--primary-dark);
+            color: var(--primary);
             margin-bottom: 2rem;
             letter-spacing: 1px;
+            font-weight: 700;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 8px rgba(108,99,255,0.08);
         }
         label {
             display: block;
             margin-bottom: 0.3rem;
             color: var(--muted);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         select, input[type="number"] {
             width: 100%;
-            padding: 0.6rem 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.08rem;
             margin-bottom: 1.2rem;
-            background: #f4f7fb;
-            transition: border-color 0.2s, background 0.3s, color 0.3s;
+            background: rgb(255, 255, 255);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 8px rgba(108,99,255,0.04);
         }
         select:focus, input[type="number"]:focus {
             border-color: var(--primary);
             outline: none;
+            box-shadow: 0 0 0 2px var(--primary, #6c63ff, 0.15);
         }
         button {
             display: block;
             width: 100%;
-            padding: 0.7rem 0;
-            background: var(--primary);
+            padding: 0.8rem 0;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
             color: #fff;
             border: none;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
             cursor: pointer;
             margin-bottom: 1.5rem;
-            transition: background 0.2s;
-            box-shadow: 0 2px 8px rgba(79,140,255,0.08);
-        }
-
-        #darkToggle {
-          width: 2.2rem;
-            height: 2.2rem;
-            min-width: 2.2rem;
-            min-height: 2.2rem;
-            max-width: 2.2rem;
-            max-height: 2.2rem;
-            border-radius: 7px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-            background: var(--primary);
-             color: #fff;
-            border: none;
-            box-shadow: 0 2px 8px rgba(79,140,255,0.08);
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        #darkToggle:hover, #darkToggle:focus {
-            background: var(--primary-dark);
-            color: #fff;
+            box-shadow: 0 4px 16px rgba(108,99,255,0.10);
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            letter-spacing: 0.5px;
         }
         button:hover, button:focus {
-            background: var(--primary-dark);
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 24px rgba(108,99,255,0.18);
         }
         #result {
-            background: #eaf1ff;
+            background: rgba(108,99,255,0.08);
             color: var(--primary-dark);
-            border-radius: 6px;
+            border-radius: 10px;
             padding: 1rem 1.2rem;
             margin-bottom: 1.5rem;
             font-size: 1.08rem;
-            box-shadow: 0 1px 4px rgba(79,140,255,0.06);
+            box-shadow: 0 1px 4px rgba(108,99,255,0.06);
             transition: background 0.3s, color 0.3s;
+            animation: fadeIn 0.8s;
         }
         #items {
             margin-top: 0;
+            margin-bottom: 2.5rem;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #f9fbfd;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.85);
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 8px rgba(44,93,182,0.04);
-            transition: background 0.3s, color 0.3s;
+            margin-bottom: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
         }
         th, td {
             padding: 0.85rem 0.7rem;
@@ -127,14 +155,23 @@
         th {
             background: var(--primary);
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             border-bottom: 2px solid var(--border);
+            letter-spacing: 0.5px;
+        }
+        tr {
+            animation: fadeInRow 0.7s;
+        }
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
         }
         tr:nth-child(even) td {
-            background: #f2f6fc;
+            background: #f6f7fb;
         }
         tr:hover td {
             background: #eaf1ff;
+            transition: background 0.2s;
         }
         td {
             border-bottom: 1px solid var(--border);
@@ -166,7 +203,6 @@
                 padding: 0.7rem 0.7rem;
             }
         }
-
         .corner-credit {
             position: fixed;
             left: 16px;
@@ -187,62 +223,29 @@
         }
         .corner-credit span {
             font-size: 1.05rem;
-            color: #6b7280;
+            color: #6c63ff;
             background: rgba(255,255,255,0.85);
             padding: 4px 10px;
             border-radius: 8px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             pointer-events: auto;
+            box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-decoration: underline;
         }
-        .flex-row > div {
-            margin-right: 0;
+        
+        #darkToggle {
+            transition: color 0.2s, background 0.2s;
+            position: relative;
         }
-        .flex-row > div:not(:last-child) {
-            margin-right: 1rem;
-        }
-
-        body.dark {
-            --primary: #7daaff;
-            --primary-dark: #b3cfff;
-            --bg: #181c23;
-            --card-bg: #232733;
-            --border: #2a2e3a;
-            --text: #e7eaf3;
-            --muted: #b3b9c9;
-        }
-        body.dark {
-            background: var(--bg);
-            color: var(--text);
-        }
-        body.dark .container {
-            background: var(--card-bg);
-            color: var(--text);
-        }
-        body.dark label {
-            color: var(--muted);
-        }
-        body.dark select, body.dark input[type="number"] {
-            background: #232733;
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-        body.dark select:focus, body.dark input[type="number"]:focus {
-            border-color: var(--primary);
-        }
-        body.dark button {
-            background: var(--primary);
-            color: #232733;
-        }
-        body.dark button:hover, body.dark button:focus {
-            background: var(--primary-dark);
-        }
-        body.dark #result {
-            background: #232e4a;
-            color: var(--primary);
+        #darkToggle .emoji {
+            display: inline-block;
+            transition: opacity 0.18s;
         }
         body.dark table {
-            background: #232733;
+            background: var(--card-bg);
             color: var(--text);
         }
         body.dark th {
@@ -252,15 +255,11 @@
         body.dark tr:nth-child(even) td {
             background: #232e4a;
         }
+        body.dark tr:nth-child(odd) td {
+            background: #232733;
+        }
         body.dark tr:hover td {
             background: #2a3550;
-        }
-        body.dark td {
-            border-bottom: 1px solid var(--border);
-        }
-        body.dark .corner-credit span {
-            background: rgba(30,34,44,0.85);
-            color: #b3b9c9;
         }
     </style>
 </head>
@@ -291,23 +290,44 @@
     </div>
     <div class="corner-credit">
         <img src="anime_girl.gif" alt="Anime Girl">
-        <span>Made by Rot</span>
+        <span id="credit-link">Made by Rot</span>
     </div>
     <script>
     const darkToggle = document.getElementById('darkToggle');
     function setDarkMode(on) {
+        const emojiSpan = darkToggle.querySelector('.emoji');
+        if (emojiSpan) {
+            emojiSpan.style.opacity = 0;
+            setTimeout(() => {
+                emojiSpan.textContent = on ? '☀️' : '🌙';
+                emojiSpan.style.opacity = 1;
+            }, 120);
+        }
         if (on) {
             document.body.classList.add('dark');
             localStorage.setItem('darkMode', '1');
-            darkToggle.textContent = '☀️';
         } else {
             document.body.classList.remove('dark');
             localStorage.setItem('darkMode', '0');
-            darkToggle.textContent = '🌙';
         }
     }
+
+    (function() {
+        const btn = document.getElementById('darkToggle');
+        const emoji = document.createElement('span');
+        emoji.className = 'emoji';
+        emoji.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        btn.textContent = '';
+        btn.appendChild(emoji);
+    })();
+
     darkToggle.onclick = () => setDarkMode(!document.body.classList.contains('dark'));
     if (localStorage.getItem('darkMode') === '1') setDarkMode(true);
+
+    // Make credit thing clickable
+    document.getElementById('credit-link').onclick = function() {
+        window.open('https://im-rot.carrd.co/', '_blank');
+    };
 
     // Load the CSV table
     let combinedData = [];
@@ -361,7 +381,7 @@ function sortTableBy(column) {
     renderTable();
 }
 
-// main calculation function
+// Main calculation function
 function calculateXP() {
     const fromLevel = parseInt(document.getElementById('fromLevel').value, 10);
     const toLevel = parseInt(document.getElementById('toLevel').value, 10);
@@ -467,7 +487,7 @@ function renderTable() {
         });
     }
 
-    // render rows
+    // Render rows
     rows.forEach(row => {
         const dataRow = document.createElement('tr');
         [
