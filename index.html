@@ -16,7 +16,9 @@
         }
         body {
             font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
-            background: var(--bg);
+            background: linear-gradient(120deg, #f5f7fa, #e0e6ed, #dbe6fd, #f5f7fa);
+            background-size: 400% 400%;
+            animation: gradientFadeBG 18s ease-in-out infinite;
             color: var(--text);
             margin: 0;
             min-height: 100vh;
@@ -29,7 +31,13 @@
             background 0.6s cubic-bezier(.4,0,.2,1),
             color 0.3s cubic-bezier(.4,0,.2,1);
         }
-        
+        @keyframes gradientFadeBG {
+            0% {background-position: 0% 50%;}
+            25% {background-position: 50% 100%;}
+            50% {background-position: 100% 50%;}
+            75% {background-position: 50% 0%;}
+            100% {background-position: 0% 50%;}
+        }
         body.dark {
             --primary: #7daaff;
             --primary-dark: #b3cfff;
@@ -38,6 +46,9 @@
             --border: #2a2e3a;
             --text: #e7eaf3;
             --muted: #b3b9c9;
+            background: linear-gradient(120deg, #181c23, #232733, #232e4a, #181c23);
+            background-size: 400% 400%;
+            animation: gradientFadeBG 18s ease-in-out infinite;
         }
         .container {
             max-width: 600px;
@@ -217,23 +228,30 @@
             width: 250px;
             height: auto;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 32px rgba(44,93,182,0.12);
+            border: 1.5px solid rgba(255,255,255,0.09);
             margin-right: 10px;
             pointer-events: auto;
+            backdrop-filter: blur(var(--glass-blur));
+            
         }
         .corner-credit span {
             font-size: 1.05rem;
             color: #6c63ff;
-            background: rgba(255,255,255,0.85);
             padding: 4px 10px;
             border-radius: 8px;
+            border: 1.5px solid rgba(131, 210, 255, 0.5);
             font-weight: 600;
             margin-bottom: 8px;
             pointer-events: auto;
-            box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+            box-shadow: 0 2px 8px rgba(153, 248, 255, 0.08);
             cursor: pointer;
-            transition: opacity 0.2s;
             text-decoration: underline;
+            backdrop-filter: blur(var(--glass-blur));
+        }
+        body.dark .corner-credit span {
+            background: rgba(35, 39, 51, 0.92);
+            color: #7daaff;
         }
         
         #darkToggle {
@@ -261,6 +279,121 @@
         body.dark tr:hover td {
             background: #2a3550;
         }
+        select option {
+            background: #fff;
+            color: var(--text);
+            transition: background 0.18s, color 0.18s;
+            border: none;
+        }
+        select option:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        select optgroup {
+            background: #f6f7fb;
+            color: var(--text);
+        }
+        body.dark select option,
+        body.dark select optgroup {
+            background: #232733;
+            color: var(--text);
+        }
+        body.dark select option:hover {
+            background: var(--primary);
+            color: #232733;
+        }
+        
+        #job {
+            display: none !important;
+        }
+        
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1.2rem;
+            user-select: none;
+        }
+        .custom-dropdown-selected {
+            background: rgb(255,255,255);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            box-shadow: 0 2px 8px rgba(108,99,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .custom-dropdown.open .custom-dropdown-selected,
+        .custom-dropdown-selected:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary, #6c63ff, 0.15);
+            background: rgb(245,247,255);
+            color: var(--text); 
+            z-index: 2;
+        }
+        .custom-dropdown-arrow {
+            margin-left: 1rem;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+        .custom-dropdown.open .custom-dropdown-arrow {
+            transform: rotate(-180deg);
+        }
+        .custom-dropdown-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 2px);
+            background: #fff;
+            border: 1.5px solid var(--primary);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(44,93,182,0.12);
+            max-height: 340px; /* Increased from 220px */
+            overflow-y: auto;
+            z-index: 10;
+            animation: fadeIn 0.18s;
+        }
+        .custom-dropdown-list-item {
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s;
+            font-size: 1.08rem;
+            color: var(--text);
+        }
+        .custom-dropdown-list-item:hover,
+        .custom-dropdown-list-item.active {
+            background: var(--primary);
+            color: #fff;
+        }
+        body.dark .custom-dropdown-selected {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        body.dark .custom-dropdown.open .custom-dropdown-selected,
+        body.dark .custom-dropdown-selected:focus {
+            background: #e7eaf3;
+            color: #232733; 
+        }
+        body.dark .custom-dropdown-list {
+            background: #232733;
+            color: var(--text);
+            border: 1.5px solid var(--primary);
+        }
+        body.dark .custom-dropdown-list-item {
+            background: #232733;
+            color: var(--text);
+        }
+        body.dark .custom-dropdown-list-item:hover,
+        body.dark .custom-dropdown-list-item.active {
+            background: var(--primary);
+            color: #232733;
+        }
     </style>
 </head>
 <body>
@@ -270,6 +403,7 @@
         </h1>
         <label for="job">Select Job:</label>
         <select id="job"></select>
+        <div id="custom-job-dropdown" class="custom-dropdown" tabindex="0" style="display:none"></div>
         <div class="flex-row" style="display: flex; gap: 1.5rem; align-items: flex-end; margin-bottom: 1.2rem; flex-wrap: wrap;">
             <div style="flex: 1 1 110px; min-width: 110px; max-width: 160px;">
                 <label for="fromLevel">From Level:</label>
@@ -324,7 +458,6 @@
     darkToggle.onclick = () => setDarkMode(!document.body.classList.contains('dark'));
     if (localStorage.getItem('darkMode') === '1') setDarkMode(true);
 
-    // Make credit thing clickable
     document.getElementById('credit-link').onclick = function() {
         window.open('https://im-rot.carrd.co/', '_blank');
     };
@@ -353,10 +486,127 @@
         });
     }
 
+    // Custom dropdown
+    function createCustomDropdown(jobs, onSelect, initialValue) {
+        const dropdown = document.getElementById('custom-job-dropdown');
+        dropdown.innerHTML = '';
+        dropdown.style.display = '';
+
+        let open = false;
+        let selectedIdx = jobs.indexOf(initialValue);
+        if (selectedIdx < 0) selectedIdx = 0;
+        let focusIdx = selectedIdx;
+
+        // Selected display
+        const selectedDiv = document.createElement('div');
+        selectedDiv.className = 'custom-dropdown-selected';
+        selectedDiv.tabIndex = 0;
+        selectedDiv.innerHTML = `<span>${jobs[selectedIdx] || 'Select...'}</span><span class="custom-dropdown-arrow">▼</span>`;
+        dropdown.appendChild(selectedDiv);
+
+        // List
+        const list = document.createElement('ul');
+        list.className = 'custom-dropdown-list';
+        list.style.display = 'none';
+        list.style.listStyle = 'none';
+        list.style.margin = 0;
+        list.style.padding = 0;
+
+        jobs.forEach((job, idx) => {
+            const item = document.createElement('li');
+            item.className = 'custom-dropdown-list-item' + (idx === selectedIdx ? ' active' : '');
+            item.textContent = job;
+            item.tabIndex = -1;
+            item.onclick = e => {
+                selectedIdx = idx;
+                focusIdx = idx;
+                setSelected();
+                close();
+                onSelect(job);
+            };
+            item.onmouseenter = () => {
+                focusIdx = idx;
+                updateActive();
+            };
+            list.appendChild(item);
+        });
+        dropdown.appendChild(list);
+
+        function openList() {
+            open = true;
+            list.style.display = '';
+            dropdown.classList.add('open');
+            updateActive();
+        }
+        function close() {
+            open = false;
+            list.style.display = 'none';
+            dropdown.classList.remove('open');
+            selectedDiv.focus();
+        }
+        function setSelected() {
+            selectedDiv.querySelector('span').textContent = jobs[selectedIdx] || 'Select...';
+            updateActive();
+        }
+        function updateActive() {
+            Array.from(list.children).forEach((li, idx) => {
+                li.classList.toggle('active', idx === focusIdx);
+            });
+        }
+        function scrollToIndex(idx) {
+            const items = list.children;
+            if (items[idx]) {
+                const rect = items[idx].getBoundingClientRect();
+                const parentRect = list.getBoundingClientRect();
+                if (rect.top < parentRect.top) {
+                    list.scrollTop -= (parentRect.top - rect.top);
+                } else if (rect.bottom > parentRect.bottom) {
+                    list.scrollTop += (rect.bottom - parentRect.bottom);
+                }
+            }
+        }
+        selectedDiv.onclick = function(e) {
+            open ? close() : openList();
+        };
+        selectedDiv.onkeydown = function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (open) {
+                    selectedIdx = focusIdx;
+                    setSelected();
+                    close();
+                    onSelect(jobs[selectedIdx]);
+                } else {
+                    openList();
+                }
+            } else if (e.key === 'Escape') {
+                close();
+            } else if (e.key.length === 1 && open) {
+                // Letter pressed, scroll to first matching job
+                const letter = e.key.toLowerCase();
+                const idx = jobs.findIndex(j => j && j[0] && j[0].toLowerCase() === letter);
+                if (idx !== -1) {
+                    focusIdx = idx;
+                    updateActive();
+                    scrollToIndex(idx);
+                }
+            }
+        };
+        list.onkeydown = null;
+        list.onblur = function(e) {
+            setTimeout(() => {
+                if (!dropdown.contains(document.activeElement)) close();
+            }, 10);
+        };
+        // Set initial
+        setSelected();
+    }
+
     // Populate job dropdown
     function populateJobList() {
         const jobSelect = document.getElementById('job');
         const jobs = [...new Set(combinedData.map(row => row.Job))];
+        // Native select for fallback (hidden)
         const fragment = document.createDocumentFragment();
         jobs.forEach(job => {
             const option = document.createElement('option');
@@ -366,6 +616,12 @@
         });
         jobSelect.innerHTML = '';
         jobSelect.appendChild(fragment);
+
+        // Custom dropdown
+        createCustomDropdown(jobs, job => {
+            jobSelect.value = job;
+        }, jobSelect.value || jobs[0]);
+        jobSelect.value = jobs[0];
     }
 
     let sortState = { column: null, asc: true, rows: [] };
@@ -493,11 +749,13 @@ function renderTable() {
         [
             row.Action,
             row.Item,
-            isNaN(row.XP) ? '–' : row.XP,
+            isNaN(Number(row.XP)) ? '–' : row.XP,
             (row.Needed !== null && !isNaN(row.Needed))
-                ? row.Needed.toLocaleString('en-US') + ' Times'
+                ? Number(row.Needed).toLocaleString('en-US') + ' Times'
                 : '–',
-            row.Money + '$'
+            (row.Money !== null && row.Money !== '–' && !isNaN(Number(row.Money.replace(/[^0-9.-]+/g, ''))))
+                ? row.Money + '$'
+                : '–'
         ].forEach(cellText => {
             const td = document.createElement('td');
             td.textContent = cellText;
@@ -510,4 +768,3 @@ function renderTable() {
 }
 </script>
 </body>
-</html>
