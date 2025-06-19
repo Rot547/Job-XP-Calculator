@@ -200,6 +200,44 @@
             color: #8a8fa3 !important;
             opacity: 1;
         }
+        .corner-credit {
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            display: flex;
+            align-items: flex-end;
+            z-index: 1000;
+            pointer-events: none;
+            user-select: none;
+        }
+        .corner-credit img {
+            width: 250px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(44,93,182,0.12);
+            border: 1.5px solid rgba(255,255,255,0.09);
+            margin-right: 10px;
+            pointer-events: auto;
+            backdrop-filter: blur(var(--glass-blur));
+        }
+        .corner-credit span {
+            font-size: 1.05rem;
+            color: #6c63ff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(131, 210, 255, 0.5);
+            font-weight: 600;
+            margin-bottom: 8px;
+            pointer-events: auto;
+            box-shadow: 0 2px 8px rgba(153, 248, 255, 0.08);
+            cursor: pointer;
+            text-decoration: underline;
+            backdrop-filter: blur(var(--glass-blur));
+        }
+        body.dark .corner-credit span {
+            background: rgba(35, 39, 51, 0.92);
+            color: #7daaff;
+        }
     </style>
 </head>
 <body>
@@ -215,6 +253,10 @@
             style="display:block;width:100%;max-width:350px;margin:0 auto 1.5rem auto;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:1rem;box-sizing:border-box;background:rgba(255,255,255,0.95);color:var(--text);"
         />
         <div id="table-container"></div>
+    </div>
+    <div class="corner-credit">
+        <img src="anime_girl.gif" alt="Anime Girl">
+        <span id="credit-link">Made by Rot</span>
     </div>
     <script>
 
@@ -362,6 +404,11 @@
             document.getElementById('table-container').innerHTML = "<h2 style='color:red;'>Error loading jobs_xp.csv..</h2>";
             console.error(err);
         });
+
+    // Add credit link click handler
+    document.getElementById('credit-link').onclick = function() {
+        window.open('https://im-rot.carrd.co/', '_blank');
+    };
     </script>
 </body>
 </html>
