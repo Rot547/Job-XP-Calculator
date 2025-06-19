@@ -83,7 +83,7 @@
         h1 {
             text-align: center;
             color: var(--primary);
-            margin-bottom: 2rem;
+            margin-bottom: 2.7rem; /* was 2rem */
             letter-spacing: 1px;
             font-weight: 700;
             font-size: 2.2rem;
@@ -431,6 +431,11 @@
         <img src="anime_girl.gif" alt="Anime Girl">
         <span id="credit-link">Made by Rot</span>
     </div>
+    <!-- Add Info Table link in bottom right -->
+    <a href="jobs_info_table.html" target="_blank"
+       style="position:fixed;right:18px;bottom:18px;z-index:1001;font-size:1.02rem;padding:7px 14px;border-radius:8px;background:rgba(108,99,255,0.12);color:#6c63ff;text-decoration:none;font-weight:600;box-shadow:0 2px 8px rgba(108,99,255,0.08);transition:background 0.2s;">
+        Info Table
+    </a>
     <script>
     const darkToggle = document.getElementById('darkToggle');
     function setDarkMode(on) {
@@ -478,8 +483,8 @@
         })
         .catch(err => {
             document.body.innerHTML = "<h2 style='color:red;'>Error loading jobs_xp.csv.</h2>";
-            console.(err);
-        });error
+            console.error(err);
+        });
 
     // Parse CSV to array of objects    
     function parseCSV(text) {
