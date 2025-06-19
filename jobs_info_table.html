@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jobs XP Table</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5548c8;
+            --accent: #ffb6b9;
+            --bg: #f5f7fa;
+            --card-bg: rgba(255,255,255,0.75);
+            --glass-blur: 12px;
+            --border: #e0e6ed;
+            --text: #232946;
+            --muted: #8a8fa3;
+        }
+        body {
+            font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #f5f7fa, #e0e6ed, #dbe6fd, #f5f7fa);
+            background-size: 400% 400%;
+            animation: gradientFadeBG 18s ease-in-out infinite;
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            transition:
+            background 0.6s cubic-bezier(.4,0,.2,1),
+            color 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes gradientFadeBG {
+            0% {background-position: 0% 50%;}
+            25% {background-position: 50% 100%;}
+            50% {background-position: 100% 50%;}
+            75% {background-position: 50% 0%;}
+            100% {background-position: 0% 50%;}
+        }
+        body.dark {
+            --primary: #7daaff;
+            --primary-dark: #b3cfff;
+            --bg: #181c23;
+            --card-bg: #232733;
+            --border: #2a2e3a;
+            --text: #e7eaf3;
+            --muted: #b3b9c9;
+            background: linear-gradient(120deg, #181c23, #232733, #232e4a, #181c23);
+            background-size: 400% 400%;
+            animation: gradientFadeBG 18s ease-in-out infinite;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 5rem 0 3rem 0;
+            background: var(--card-bg);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(44,93,182,0.12);
+            padding: 2.5rem 2rem 2rem 2rem;
+            min-height: 400px;
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1.5px solid rgba(255,255,255,0.25);
+            animation: fadeIn 1s cubic-bezier(.4,0,.2,1), containerBgChange 0.7s;
+            overflow: visible;
+            transition:
+                background 0.7s cubic-bezier(.4,0,.2,1),
+                box-shadow 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes containerBgChange {
+            from {
+                background: #e0e6ed;
+            }
+            to {
+                background: var(--card-bg);
+            }
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 8px rgba(108,99,255,0.08);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.85);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        th, td {
+            padding: 0.85rem 0.7rem;
+            text-align: left;
+        }
+        th {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+        }
+        tr {
+            animation: fadeInRow 0.7s;
+        }
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        tr:nth-child(even) td {
+            background: #f6f7fb;
+        }
+        tr:hover td {
+            background: #eaf1ff;
+            transition: background 0.2s;
+        }
+        td {
+            border-bottom: 1px solid var(--border);
+            font-size: 1rem;
+        }
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 98vw;
+                padding: 1.2rem 0.5rem;
+            }
+            th, td {
+                padding: 0.6rem 0.3rem;
+                font-size: 0.97rem;
+            }
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.2rem 0.5rem;
+                max-width: 98vw;
+                overflow-x: auto;
+            }
+            th, td {
+                padding: 0.6rem 0.3rem;
+                font-size: 0.97rem;
+            }
+            table {
+                font-size: 0.93rem;
+            }
+        }
+        body.dark table {
+            background: var(--card-bg);
+            color: var(--text);
+        }
+        body.dark th {
+            background: var(--primary);
+            color: #232733;
+        }
+        body.dark tr:nth-child(even) td {
+            background: #232e4a;
+        }
+        body.dark tr:nth-child(odd) td {
+            background: #232733;
+        }
+        body.dark tr:hover td {
+            background: #2a3550;
+        }
+        #darkToggle {
+            transition: color 0.2s, background 0.2s;
+            position: relative;
+            float: right;
+            margin-top: -0.7rem;
+            margin-right: -0.7rem;
+            font-size: 0.95rem;
+            padding: 0.3rem 1.1rem;
+            width: auto;
+            min-width: unset;
+            box-shadow: none;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        #darkToggle .emoji {
+            display: inline-block;
+            transition: opacity 0.18s;
+        }
+
+        body.dark #searchBar {
+            color: #232946 !important;
+            caret-color: #232946 !important;
+        }
+        body.dark #searchBar::placeholder {
+            color: #8a8fa3 !important;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Jobs Info Table
+            <button id="darkToggle"><span class="emoji">🌙</span></button>
+        </h1>
+        <input
+            id="searchBar"
+            type="text"
+            placeholder="Search jobs..."
+            style="display:block;width:100%;max-width:350px;margin:0 auto 1.5rem auto;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:1rem;box-sizing:border-box;background:rgba(255,255,255,0.95);color:var(--text);"
+        />
+        <div id="table-container"></div>
+    </div>
+    <script>
+
+    const darkToggle = document.getElementById('darkToggle');
+    function setDarkMode(on) {
+        const emojiSpan = darkToggle.querySelector('.emoji');
+        if (emojiSpan) {
+            emojiSpan.style.opacity = 0;
+            setTimeout(() => {
+                emojiSpan.textContent = on ? '☀️' : '🌙';
+                emojiSpan.style.opacity = 1;
+            }, 120);
+        }
+        if (on) {
+            document.body.classList.add('dark');
+            localStorage.setItem('darkMode', '1');
+        } else {
+            document.body.classList.remove('dark');
+            localStorage.setItem('darkMode', '0');
+        }
+    }
+    (function() {
+        const btn = document.getElementById('darkToggle');
+        const emoji = document.createElement('span');
+        emoji.className = 'emoji';
+        emoji.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        btn.textContent = '';
+        btn.appendChild(emoji);
+    })();
+    darkToggle.onclick = () => setDarkMode(!document.body.classList.contains('dark'));
+    if (localStorage.getItem('darkMode') === '1') setDarkMode(true);
+
+    // CSV parsing
+    function parseCSV(text) {
+        const lines = text.trim().split("\n");
+        // Remove comment lines
+        const filtered = lines.filter(line => !line.trim().startsWith('//'));
+        const headers = filtered[0].split(",").map(h => h.trim().replace(/"/g, ''));
+        return filtered.slice(1).map(line => {
+            const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(v => v.replace(/^"|"$/g, ''));
+            return Object.fromEntries(headers.map((h, i) => [h, values[i]]));
+        });
+    }
+
+    // Table rendering and sorting
+    let tableData = [];
+    let filteredData = [];
+    let sortState = { column: null, asc: true };
+
+    function renderTable() {
+        const container = document.getElementById('table-container');
+        container.innerHTML = '';
+        // Use filteredData for rendering
+        const dataToRender = filteredData.length || document.getElementById('searchBar').value ? filteredData : tableData;
+        if (!dataToRender.length) {
+            container.innerHTML = "<div style='text-align:center;color:var(--muted);padding:2rem 0;'>No results found.</div>";
+            return;
+        }
+
+        const headers = Object.keys(dataToRender[0]);
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tr = document.createElement('tr');
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            th.onclick = () => sortTableBy(header);
+            if (sortState.column === header) {
+                const arrow = document.createElement('span');
+                arrow.style.whiteSpace = 'nowrap';
+                arrow.textContent = sortState.asc ? " ▲" : " ▼";
+                th.appendChild(arrow);
+            }
+            tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        let rows = dataToRender.slice();
+        if (sortState.column) {
+            rows.sort((a, b) => {
+                let v1 = a[sortState.column];
+                let v2 = b[sortState.column];
+                // Try numeric sort if possible
+                let n1 = parseFloat(v1);
+                let n2 = parseFloat(v2);
+                if (!isNaN(n1) && !isNaN(n2)) {
+                    return sortState.asc ? n1 - n2 : n2 - n1;
+                }
+                return sortState.asc
+                    ? String(v1).localeCompare(String(v2))
+                    : String(v2).localeCompare(String(v1));
+            });
+        }
+        rows.forEach(row => {
+            const tr = document.createElement('tr');
+            headers.forEach(header => {
+                const td = document.createElement('td');
+                td.textContent = row[header];
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        container.appendChild(table);
+    }
+
+    function sortTableBy(column) {
+        if (sortState.column === column) {
+            sortState.asc = !sortState.asc;
+        } else {
+            sortState.column = column;
+            sortState.asc = true;
+        }
+        renderTable();
+    }
+
+    // Search/filter logic
+    function filterTable() {
+        const query = document.getElementById('searchBar').value.trim().toLowerCase();
+        if (!query) {
+            filteredData = [];
+        } else {
+            filteredData = tableData.filter(row =>
+                Object.values(row).some(val =>
+                    String(val).toLowerCase().includes(query)
+                )
+            );
+        }
+        renderTable();
+    }
+
+    document.getElementById('searchBar').addEventListener('input', filterTable);
+
+    // Load CSV and render
+    fetch("jobs_xp.csv")
+        .then(response => response.text())
+        .then(text => {
+            tableData = parseCSV(text);
+            filteredData = [];
+            renderTable();
+        })
+        .catch(err => {
+            document.getElementById('table-container').innerHTML = "<h2 style='color:red;'>Error loading jobs_xp.csv..</h2>";
+            console.error(err);
+        });
+    </script>
+</body>
+</html>
